@@ -8,6 +8,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.Weigher;
 import com.google.common.collect.ImmutableList;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 import com.google.common.net.InternetDomainName;
@@ -176,4 +178,21 @@ public class ApiTest {
         log.info("测试结果 - isOverridable：{}", invokable.isOverridable());
     }
 
+    @Test
+    public void test_eventbus() {
+        EventBus eventBus = new EventBus();
+        eventBus.register(new Listener());
+        // 可以由其他服务推送消息，之后就可以在监听中收到了
+        eventBus.post("消息总线，订单号：100001");
+    }
+
+    static class Listener {
+        @Subscribe
+        public void handleEvent(String orderId) {
+            log.info("测试结果：{}", orderId);
+        }
+    }
+
 }
+
+
